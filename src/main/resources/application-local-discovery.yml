@@ -1,0 +1,5 @@
+#Eureka itself is designed to run as cluster, but hre for localhost we dont want that to happen
+#this disable registration with Eureka
+eureka:
+  client:
+    register-with-eureka: false
