@@ -24,11 +24,30 @@ public class LoadBalancedRoutesConfig {
                 .uri("lb://micro-02-mssc-beer-service")
                 .id("beer-service"))
             .route(r -> r.path("/api/v1/customers/**")
+                .filters(f -> f.circuitBreaker(
+                    c -> c
+                        .setName("inventoryCB")
+                        //if "/api/v1/customers/**" service is down then redirect to "forward:/inventory-failover"
+                        .setFallbackUri("forward:/inventory-failover")
+                        .setRouteId("inv-failover")
+
+                ))
                 .uri("lb://micro-05-mssc-beer-order-service")
                 .id("beer-order-service"))
             .route(r -> r.path("/api/v1/beer/*/inventory")
+                .filters(f -> f.circuitBreaker(
+                    c -> c
+                        .setName("inventoryCB")
+                        //if inventoryService can't be reached-is down then redirect to "forward:/inventory-failover"
+                        .setFallbackUri("forward:/inventory-failover")
+                        .setRouteId("inv-failover")
+
+                ))
                 .uri("lb://micro-06-mssc-beer-inventory-service")
                 .id("beer-inventory-service"))
+            .route(r -> r.path("/inventory-failover/**")
+                .uri("lb://micro-12-mssc-inventory-failover-reactive")
+                .id("inventory-failover-reactive"))
             .build();
     }
 
