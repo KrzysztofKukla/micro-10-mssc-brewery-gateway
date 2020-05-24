@@ -1,7 +1,9 @@
 spring:
   application:
     name: micro-10-mssc-brewery-gateway
-
+  #distributed tracing server
+  zipkin:
+    baseUrl: http://localhost:9411
 
 server:
   port: 9091
